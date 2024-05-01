@@ -1,18 +1,23 @@
 ---
 layout: page
-title: About
-permalink: /about/
+title: Word Search Puzzle Solution
+permalink: /solution/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
-
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
-
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
-
-
-[jekyll-organization]: https://github.com/jekyll
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Select Category
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#">Adventure Sports</a>
+    <a class="dropdown-item" href="#">Animals</a>
+    <a class="dropdown-item" href="#">Around the House</a>
+    <a class="dropdown-item" href="#">Around the World</a>
+    <a class="dropdown-item" href="#">Art Movements</a>
+    <a class="dropdown-item" href="#">Art Supplies</a>
+    <a class="dropdown-item" href="#">At the Beach</a>
+    <a class="dropdown-item" href="#">At the Circus</a>
+    <a class="dropdown-item" href="#">At the Park</a>
+    <a class="dropdown-item" href="#">At the Zoo</a>
+  </div>
+</div>
