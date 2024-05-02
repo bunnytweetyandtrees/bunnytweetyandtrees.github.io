@@ -5,6 +5,7 @@ layout: default
 <script>
   document.addEventListener("DOMContentLoaded", function() {
     var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    var wordCellsMap = {}; // Object to store cell indices for each word
 
     checkboxes.forEach(function(checkbox) {
       checkbox.addEventListener("change", function() {
@@ -17,7 +18,7 @@ layout: default
         if (this.checked) {
           markWordInPuzzle(puzzleCells, word);
         } else {
-          resetWordInPuzzle(puzzleCells, word);
+          resetWordInPuzzle(word);
         }
       });
     });
@@ -65,28 +66,37 @@ layout: default
         }
       }
 
+      var cellIndices = [];
       for (var k = 0; k < word.length; k++) {
         var newRow = row + k * rowDir;
         var newCol = col + k * colDir;
-        var cell = cells[newRow * 16 + newCol];
+        var cellIndex = newRow * 16 + newCol;
+        var cell = cells[cellIndex];
         cell.style.color = "red";
         cell.style.fontWeight = "bold";
+        cellIndices.push(cellIndex);
       }
+      wordCellsMap[word] = cellIndices;
+      console.log(wordCellsMap);
       return true;
     }
 
-
-    function resetWordInPuzzle(cells, word) {
+    function resetWordInPuzzle(word) {
+      // Convert the word to uppercase and remove non-alphabetic characters
+      var word = word.toUpperCase().replace(/[^A-Z]/g, '');
       console.log("Resetting word in puzzle:", word);
-      for (var i = 0; i < cells.length; i++) {
-        var cell = cells[i];
-        if (cell.style.color === "red" && cell.style.fontWeight === "bold") {
-          cell.style.color = ""; // Reset color to default
-          cell.style.fontWeight = ""; // Reset font weight to default
-        }
-      }
-    }
+      var cellIndices = wordCellsMap[word];
+      if (!cellIndices) return; // Word not found in map
 
+      for (var i = 0; i < cellIndices.length; i++) {
+        var cellIndex = cellIndices[i];
+        var cell = document.querySelector('table').getElementsByTagName('td')[cellIndex];
+        cell.style.color = ""; // Reset color to default
+        cell.style.fontWeight = ""; // Reset font weight to default
+      }
+      delete wordCellsMap[word]; // Remove word entry from map
+      console.log(wordCellsMap);
+    }
   });
 </script>
 
