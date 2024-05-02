@@ -4,25 +4,79 @@ layout: default
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    var themesRadioButtons = document.querySelectorAll('input[type="radio"][name="themes"]');
+    var checkboxesContainer = document.getElementById('checkboxForm'); // Get the checkboxes container
     var wordCellsMap = {}; // Object to store cell indices for each word
 
-    checkboxes.forEach(function(checkbox) {
-      checkbox.addEventListener("change", function() {
-        console.log("Checkbox changed:", this.checked);
-        var word = this.getAttribute("data-word");
-        console.log("Word:", word);
-        var puzzleTable = document.querySelector("table");
+    themesRadioButtons.forEach(function(radioButton) {
+      radioButton.addEventListener("change", function() {
+        var selectedTheme = this.getAttribute("data-word");
+        var words = {{ site.data.puzzle_data.Easy_Placed_Words | jsonify }};
+        var wordList = words[selectedTheme];
+        updateCheckboxes(wordList);
+        var puzzles = {{ site.data.puzzle_data.Easy_Boards | jsonify }};
+        populatePuzzle(puzzles[selectedTheme]);
+      });
+    });
+
+    function populatePuzzle(puzzle) {
+      var puzzleTable = document.getElementById('puzzleTable');
+      puzzleTable.innerHTML = ''; // Clear previous puzzle
+
+      // Iterate through rows and cells to populate puzzle table
+      puzzle.forEach(function(row) {
+        var tr = document.createElement('tr');
+        row.forEach(function(cell) {
+          var td = document.createElement('td');
+          td.setAttribute('data-letter', cell);
+          td.textContent = cell;
+          tr.appendChild(td);
+        });
+        puzzleTable.appendChild(tr);
+      });
+    }
+
+    function updateCheckboxes(wordList) {
+      checkboxesContainer.innerHTML = ''; // Clear previous checkboxes
+
+      // Loop through the wordList and generate checkboxes and labels
+      wordList.forEach(function(item, index) {
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = 'checkbox' + index;
+        checkbox.name = 'checkbox' + index;
+        checkbox.setAttribute('data-word', item); // Set data-word attribute
+        checkboxesContainer.appendChild(checkbox);
+
+        var label = document.createElement('label');
+        label.setAttribute('for', 'checkbox' + index);
+        label.textContent = item;
+        checkboxesContainer.appendChild(label);
+
+        var lineBreak = document.createElement('br');
+        checkboxesContainer.appendChild(lineBreak);
+      });
+    }
+
+    // Attach event listeners for checkboxes after they are generated
+    checkboxesContainer.addEventListener("change", function(event) {
+      if (event.target.type === 'checkbox') {
+        var isChecked = event.target.checked;
+        var word = event.target.getAttribute("data-word");
+        var puzzleTable = document.getElementById('puzzleTable');
         var puzzleCells = puzzleTable.getElementsByTagName("td");
 
-        if (this.checked) {
+        if (isChecked) {
           markWordInPuzzle(puzzleCells, word);
         } else {
           resetWordInPuzzle(word);
         }
-      });
+      }
     });
 
+    // Function definitions for marking and resetting words in puzzle...
+
+    // Define your JavaScript function to mark a word in the puzzle
     function markWordInPuzzle(cells, word) {
       console.log("Marking word in puzzle:", word);
       // Convert the word to uppercase and remove non-alphabetic characters
@@ -100,33 +154,31 @@ layout: default
   });
 </script>
 
-<div style="display: flex; justify-content: space-between;">
+<div style="display: flex; justify-content: center; align-items: flex-start;">
   <div style="width: 30%; margin-right: 20px;"> <!-- Added margin-right for the gap -->
-    <h2>Checkboxes</h2>
-
+    <h2>Themes</h2>
+    Select a theme.
     <form action="">
-      {% assign total_words = site.data.words | size %}
-      {% for item in site.data.words limit: total_words %}
-        <input type="checkbox" id="checkbox{{ item.id }}" name="checkbox{{ item.id }}" data-word="{{ item.label }}">
-        <label for="checkbox{{ item.id }}">{{ item.label }}</label><br>
+      {% assign themes = site.data.puzzle_data.Theme %}
+      {% for theme in themes %}
+        <input type="radio" id="radio{{ theme[0] }}" name="themes" data-word="{{ theme[0] }}" {% if forloop.first %} checked {% endif %}>
+        <label for="radio{{ theme[0] }}">{{ theme[1] }}</label><br>
       {% endfor %}
     </form>
-
-    Select a word to see it in the puzzle.
-
   </div>
 
-  <div style="width: 70%;">
+  <div style="width: 20%; margin-right: 20px;"> <!-- Added margin-right for the gap -->
+    <h2>Checkboxes</h2>
+    Select a word to see it in the puzzle.
+    <form id="checkboxForm" action="">
+    </form>
+  </div>
+
+  <div style="width: 50%;">
     <h2>Word Search Puzzle</h2>
-    <table border="1">
-      {% assign puzzle = site.data.puzzle.puzzle %}
-      {% for row in puzzle %}
-        <tr>
-          {% for cell in row %}
-            <td data-letter="{{ cell }}">{{ cell }}</td>
-          {% endfor %}
-        </tr>
-      {% endfor %}
+    <table border="1" id="puzzleTable">
+      <!-- Puzzle will be dynamically populated here -->
     </table>
   </div>
+
 </div>
