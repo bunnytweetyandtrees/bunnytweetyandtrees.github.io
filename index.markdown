@@ -7,17 +7,41 @@ layout: default
     var themesRadioButtons = document.querySelectorAll('input[type="radio"][name="themes"]');
     var checkboxesContainer = document.getElementById('checkboxForm'); // Get the checkboxes container
     var wordCellsMap = {}; // Object to store cell indices for each word
+    var puzzleSize = 16;
+    var themeSelect = document.getElementById('themeSelect');
+    var easyRadio = document.getElementById('easyRadio');
+    var hardRadio = document.getElementById('hardRadio');
 
-    themesRadioButtons.forEach(function(radioButton) {
-      radioButton.addEventListener("change", function() {
-        var selectedTheme = this.getAttribute("data-word");
-        var words = {{ site.data.puzzle_data.Easy_Placed_Words | jsonify }};
-        var wordList = words[selectedTheme];
-        updateCheckboxes(wordList);
-        var puzzles = {{ site.data.puzzle_data.Easy_Boards | jsonify }};
-        populatePuzzle(puzzles[selectedTheme]);
-      });
+    // Event listener for theme select dropdown
+    themeSelect.addEventListener("change", function() {
+      var selectedTheme = themeSelect.value;
+      var words;
+      var puzzles;
+
+      if (easyRadio.checked) {
+        words = {{ site.data.puzzle_data.Easy_Placed_Words | jsonify }};
+        puzzles = {{ site.data.puzzle_data.Easy_Boards | jsonify }};
+      } else if (hardRadio.checked) {
+        words = {{ site.data.puzzle_data.Hard_Placed_Words | jsonify }};
+        puzzles = {{ site.data.puzzle_data.Hard_Boards | jsonify }};
+      }
+
+      var wordList = words[selectedTheme];
+      updateCheckboxes(wordList);
+      populatePuzzle(puzzles[selectedTheme]);
     });
+
+    // Event listener for difficulty radio buttons
+    easyRadio.addEventListener("change", function() {
+      themeSelect.dispatchEvent(new Event('change')); // Trigger change event for theme select dropdown
+    });
+
+    hardRadio.addEventListener("change", function() {
+      themeSelect.dispatchEvent(new Event('change')); // Trigger change event for theme select dropdown
+    });
+
+    // Trigger change event for theme select dropdown to load default data
+    themeSelect.dispatchEvent(new Event('change'));
 
     function populatePuzzle(puzzle) {
       var puzzleTable = document.getElementById('puzzleTable');
@@ -50,7 +74,7 @@ layout: default
 
         var label = document.createElement('label');
         label.setAttribute('for', 'checkbox' + index);
-        label.textContent = item;
+        label.textContent = item.toUpperCase();
         checkboxesContainer.appendChild(label);
 
         var lineBreak = document.createElement('br');
@@ -111,10 +135,10 @@ layout: default
       for (var k = 0; k < word.length; k++) {
         var newRow = row + k * rowDir;
         var newCol = col + k * colDir;
-        if (newRow < 0 || newRow >= 16 || newCol < 0 || newCol >= 16) {
+        if (newRow < 0 || newRow >= puzzleSize || newCol < 0 || newCol >= puzzleSize) {
           return false;
         }
-        var cell = cells[newRow * 16 + newCol];
+        var cell = cells[newRow * puzzleSize + newCol];
         if (cell.textContent !== word.charAt(k)) {
           return false;
         }
@@ -124,7 +148,7 @@ layout: default
       for (var k = 0; k < word.length; k++) {
         var newRow = row + k * rowDir;
         var newCol = col + k * colDir;
-        var cellIndex = newRow * 16 + newCol;
+        var cellIndex = newRow * puzzleSize + newCol;
         var cell = cells[cellIndex];
         cell.style.color = "red";
         cell.style.fontWeight = "bold";
@@ -155,27 +179,32 @@ layout: default
 </script>
 
 <div style="display: flex; justify-content: center; align-items: flex-start;">
-  <div style="width: 30%; margin-right: 20px;"> <!-- Added margin-right for the gap -->
-    <h2>Themes</h2>
-    Select a theme.
-    <form action="">
+  <div style="width: 30%; margin-right: 20px;">
+    <h2>Select a Theme</h2>
+    <select id="themeSelect">
       {% assign themes = site.data.puzzle_data.Theme %}
       {% for theme in themes %}
-        <input type="radio" id="radio{{ theme[0] }}" name="themes" data-word="{{ theme[0] }}" {% if forloop.first %} checked {% endif %}>
-        <label for="radio{{ theme[0] }}">{{ theme[1] }}</label><br>
+        <option value="{{ theme[0] }}">{{ theme[1] }}</option>
       {% endfor %}
-    </form>
-  </div>
-
-  <div style="width: 20%; margin-right: 20px;"> <!-- Added margin-right for the gap -->
-    <h2>Checkboxes</h2>
+    </select>
+    <br/>
+    <br/>
+    <h2>Select the Puzzle</h2>
+    <input type="radio" id="easyRadio" name="difficulty" value="Easy" checked>
+    <label for="easyRadio">Top (Easy)</label>
+    <br/>
+    <input type="radio" id="hardRadio" name="difficulty" value="Hard">
+    <label for="hardRadio">Bottom (Hard)</label>
+    <br/>
+    <br/>
+    <h2>Words</h2>
     Select a word to see it in the puzzle.
     <form id="checkboxForm" action="">
     </form>
   </div>
 
-  <div style="width: 50%;">
-    <h2>Word Search Puzzle</h2>
+  <div style="width: 70%;">
+    <h2>Puzzle</h2>
     <table border="1" id="puzzleTable">
       <!-- Puzzle will be dynamically populated here -->
     </table>
