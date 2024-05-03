@@ -155,6 +155,7 @@ layout: default
         var cell = cells[cellIndex];
         cell.style.color = "red";
         cell.style.fontWeight = "bold";
+        cell.style.backgroundColor = "rgba(255, 128, 128, 0.3)";
         cellIndices.push(cellIndex);
       }
       wordCellsMap[word] = cellIndices;
@@ -174,6 +175,7 @@ layout: default
         var cell = document.querySelector('table').getElementsByTagName('td')[cellIndex];
         cell.style.color = ""; // Reset color to default
         cell.style.fontWeight = ""; // Reset font weight to default
+        cell.style.backgroundColor = "";
       }
       delete wordCellsMap[word]; // Remove word entry from map
       console.log(wordCellsMap);
