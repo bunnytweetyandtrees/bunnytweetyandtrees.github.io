@@ -61,25 +61,28 @@ layout: default
     }
 
     function updateCheckboxes(wordList) {
-      checkboxesContainer.innerHTML = ''; // Clear previous checkboxes
+        checkboxesContainer.innerHTML = ''; // Clear previous checkboxes
 
-      // Loop through the wordList and generate checkboxes and labels
-      wordList.forEach(function(item, index) {
-        var checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.id = 'checkbox' + index;
-        checkbox.name = 'checkbox' + index;
-        checkbox.setAttribute('data-word', item); // Set data-word attribute
-        checkboxesContainer.appendChild(checkbox);
+        // Sort the word list alphabetically
+        wordList.sort();
 
-        var label = document.createElement('label');
-        label.setAttribute('for', 'checkbox' + index);
-        label.textContent = item.toUpperCase();
-        checkboxesContainer.appendChild(label);
+        // Loop through the sorted wordList and generate checkboxes and labels
+        wordList.forEach(function(item, index) {
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = 'checkbox' + index;
+            checkbox.name = 'checkbox' + index;
+            checkbox.setAttribute('data-word', item); // Set data-word attribute
+            checkboxesContainer.appendChild(checkbox);
 
-        var lineBreak = document.createElement('br');
-        checkboxesContainer.appendChild(lineBreak);
-      });
+            var label = document.createElement('label');
+            label.setAttribute('for', 'checkbox' + index);
+            label.textContent = item.toUpperCase();
+            checkboxesContainer.appendChild(label);
+
+            var lineBreak = document.createElement('br');
+            checkboxesContainer.appendChild(lineBreak);
+        });
     }
 
     // Attach event listeners for checkboxes after they are generated
