@@ -204,7 +204,6 @@ layout: default
   </div>
 
   <div style="width: 70%;">
-    <h2>Puzzle</h2>
     <table border="1" id="puzzleTable">
       <!-- Puzzle will be dynamically populated here -->
     </table>
