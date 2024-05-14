@@ -4,13 +4,39 @@ layout: default
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    var themesRadioButtons = document.querySelectorAll('input[type="radio"][name="themes"]');
     var checkboxesContainer = document.getElementById('checkboxForm'); // Get the checkboxes container
     var wordCellsMap = {}; // Object to store cell indices for each word
     var puzzleSize = 16;
     var themeSelect = document.getElementById('themeSelect');
     var easyRadio = document.getElementById('easyRadio');
     var hardRadio = document.getElementById('hardRadio');
+    var bookSelect = document.getElementById('bookSelect'); // Get the book select dropdown
+    var data;
+
+    // Event listener for book select dropdown
+    bookSelect.addEventListener("change", function() {
+      var selectedBook = bookSelect.value;
+      if (selectedBook === 'adults') {
+        data = {{ site.data.adults_puzzle_data | jsonify }};
+      } else {
+        data = {{ site.data.kids_puzzle_data | jsonify }};
+      }
+      populateThemes();
+      themeSelect.dispatchEvent(new Event('change'));
+    });
+
+    // Function to populate themes in the theme select dropdown
+    function populateThemes() {
+        themeSelect.innerHTML = ''; // Clear previous options
+        for (var key in data['Theme']) {
+            if (data['Theme'].hasOwnProperty(key)) {
+                var option = document.createElement('option');
+                option.value = key;
+                option.textContent = data['Theme'][key];
+                themeSelect.appendChild(option);
+            }
+        }
+    }
 
     // Event listener for theme select dropdown
     themeSelect.addEventListener("change", function() {
@@ -19,11 +45,11 @@ layout: default
       var puzzles;
 
       if (easyRadio.checked) {
-        words = {{ site.data.puzzle_data.Easy_Placed_Words | jsonify }};
-        puzzles = {{ site.data.puzzle_data.Easy_Boards | jsonify }};
+        words = data['Easy_Placed_Words'];
+        puzzles = data['Easy_Boards'];
       } else if (hardRadio.checked) {
-        words = {{ site.data.puzzle_data.Hard_Placed_Words | jsonify }};
-        puzzles = {{ site.data.puzzle_data.Hard_Boards | jsonify }};
+        words = data['Hard_Placed_Words'];
+        puzzles = data['Hard_Boards'];
       }
 
       var wordList = words[selectedTheme];
@@ -41,7 +67,7 @@ layout: default
     });
 
     // Trigger change event for theme select dropdown to load default data
-    themeSelect.dispatchEvent(new Event('change'));
+    bookSelect.dispatchEvent(new Event('change'));
 
     function populatePuzzle(puzzle) {
       var puzzleTable = document.getElementById('puzzleTable');
@@ -185,13 +211,15 @@ layout: default
 
 <div style="display: flex; justify-content: center; align-items: flex-start;">
   <div style="width: 30%; margin-right: 20px;">
-    <h2>Select a Theme</h2>
-    <select id="themeSelect">
-      {% assign themes = site.data.puzzle_data.Theme %}
-      {% for theme in themes %}
-        <option value="{{ theme[0] }}">{{ theme[1] }}</option>
-      {% endfor %}
+    <h2>Select a Book</h2>
+    <select id="bookSelect">
+      <option value="kids">Word Search Puzzle for Kids</option>
+      <option value="adults">Word Search Puzzle for Adults</option>
     </select>
+    <br/>
+    <br/>
+    <h2>Select a Theme</h2>
+    <select id="themeSelect"></select>
     <br/>
     <br/>
     <h2>Select the Puzzle</h2>
